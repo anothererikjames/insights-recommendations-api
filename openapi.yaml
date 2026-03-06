@@ -1,0 +1,100 @@
+openapi: 3.0.3
+info:
+  title: Notifications API
+  description: Multi-channel notification delivery service
+  version: "1.0.0"
+  contact:
+    name: Notifications Team
+    email: notifications@example.com
+
+servers:
+  - url: https://notifications.api.example.com/v1
+    description: Production
+
+paths:
+  /messages/email:
+    post:
+      operationId: sendEmail
+      summary: Send an email notification
+      tags: [Messages]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailMessage"
+      responses:
+        "202":
+          description: Email queued for delivery
+
+  /messages/sms:
+    post:
+      operationId: sendSms
+      summary: Send an SMS notification
+      tags: [Messages]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SmsMessage"
+      responses:
+        "202":
+          description: SMS queued
+
+  /templates:
+    get:
+      operationId: listTemplates
+      summary: List notification templates
+      tags: [Templates]
+      responses:
+        "200":
+          description: Templates list
+
+  /preferences/{userId}:
+    get:
+      operationId: getPreferences
+      summary: Get notification preferences for a user
+      tags: [Preferences]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User preferences
+        "404":
+          description: User not found
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    EmailMessage:
+      type: object
+      required: [to, subject, templateId]
+      properties:
+        to:
+          type: string
+          format: email
+        subject:
+          type: string
+        templateId:
+          type: string
+        variables:
+          type: object
+
+    SmsMessage:
+      type: object
+      required: [to, body]
+      properties:
+        to:
+          type: string
+        body:
+          type: string
