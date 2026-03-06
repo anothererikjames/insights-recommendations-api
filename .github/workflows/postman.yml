@@ -11,14 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Postman CLI
-        run: npm install -g @postman/cli
-
-      - name: Login to Postman CLI
-        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
-
-      - name: Run Postman Collection
+      - name: Install and Run Postman Tests
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
         run: |
+          curl -o- "https://dl-cli.pstmn.io/install.sh" | sh
+          export PATH="$HOME/.local/share/postman-cli:$PATH"
+          postman login --with-api-key "$POSTMAN_API_KEY"
           postman collection run "52238111-eb920a70-b184-4cfb-bdb6-1388d7c4d1a1" \
             --environment "52238111-db96d8f3-ef43-4b67-a258-686f0634f60c" \
             --verbose
